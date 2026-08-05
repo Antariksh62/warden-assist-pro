@@ -1,68 +1,87 @@
-# HOIDSS — Hostel Operations Intelligence & Decision Support System (Design Only)
+# HOIDSS — Hostel Operations Intelligence (Design Only)
 
-An executive decision-support surface for the Hostel Incharge / Chief Warden. Not an analytics dashboard: the screen walks the reader through six questions in order and ends every element in an action. Deliverable is design — workflow, hierarchy, narrative, component semantics, tokens, motion. No backend, no APIs, no auth, no data models, no business logic, no new routes.
+An operations-intelligence console for the Hostel Incharge of PICT Boys Hostel. Not a dashboard of charts: one continuous investigation surface where every element hands the reader to the next question. Deliverable is design — workflow, context model, hierarchy, narrative, component semantics, tokens, motion. No backend, no APIs, no auth, no data models, no business logic, no new routes.
 
-## The six questions as the page spine
+## The investigation loop (the core UX contract)
 
 ```text
-1. WHAT IS HAPPENING NOW?     Executive Brief + KPI signal strip
-2. WHY IS IT HAPPENING?       Complaint Intelligence
-3. WHERE IS IT HAPPENING?     Spatial Intelligence + heatmap
-4. WHO IS RESPONSIBLE?        Operational queue + Staff Intelligence
-5. WHAT SHOULD I DO NEXT?     AI Recommendation rail (pinned)
-6. WHAT BREAKS SOON?          Maintenance, Financial, Predictive Intelligence
+WHAT is happening?  ->  WHY?  ->  WHERE exactly?  ->  WHO owns it?
+        ->  WHAT should I do?  ->  WHAT if I don't?
 ```
 
-Each band is titled with its question, carries a one-line written verdict above any visual, and ends with a way forward. The recommendation rail is pinned alongside bands 2-4 so cause and remedy stay visible together.
+**One shared investigation context** drives the whole page: `{ category, hostel, block, floor, room, severity, dateRange, staff }`. Any click writes to it; every band reads from it.
 
-## What each reference contributes (extract, don't average)
+- Clicking a KPI, a category slice, an alert row, a staff member, an inspection or a heatmap cell narrows the context — it does not open a dead end.
+- A **context bar** under the header shows the active investigation as removable chips ("Electrical", "Block B", "Last 14 days") with Clear all, plus a back-step so the reader can retrace the investigation.
+- Bands re-narrate under the active context: titles, verdict sentences and recommended actions all restate against the current filter.
 
-- **Lunor (dark contract app)** — the overall dark shell: near-black canvas, hairline-bordered cards, restrained monochrome charts, sidebar grouping with a workspace section. This sets the base surface language.
-- **Kravio (dark ticketing)** — the KPI card pattern (label + eyebrow icon, large tabular value, delta vs last week, inline sparkline) and the right-hand "Latest Updates" activity rail, which becomes the Notification Center sheet.
-- **Power BI board** — density and small-multiple discipline: tight labelled chart titles with a subtitle stating the dimension. Adopted for Complaint and Financial Intelligence; its color use is explicitly rejected.
-- **Signalry** — the toolbar rhythm: horizontal metric row, then a three-up analysis grid, then a full-width insight table. Adopted for the band internals.
-- **PlanMate** — the breathing spacing and the light-mode calibration: how much air a card needs, how the light theme should read.
-- **Adflux** — breadcrumb + page title + status pill + tab strip + filter cluster as one header block, and delta chips with directional micro-sparklines. Adopted for the sticky scope bar.
-- **TailAdmin (both shots)** — the header composition: hamburger/collapse, command-palette search with ⌘K affordance, theme toggle, notification bell with unread dot, user chip. Also the radial gauge treatment, reused for the Hostel Health Score. Its blue-on-white brightness is rejected.
-- **TailAdmin skeleton shot** — the loading choreography: skeleton blocks in the exact final card geometry, staggered fade-in.
+Worked path, designed explicitly: Open Complaints -> Electrical -> Complaint Intelligence re-scopes to Electrical -> heatmap highlights affected hostels/blocks/floors/rooms and dims the rest -> selecting Room B-214 opens the Investigation Drawer -> drawer ends in Approve inspection, which returns the reader to Mission Control with that recommendation resolved.
 
-Nothing is copied verbatim: no reference data, no reference palette, no branding.
+## Page order and natural-language titles
+
+```text
++---------+--------------------------------------------------------------+
+| SIDEBAR | HEADER  PICT Boys Hostel / Today's Operational Status        |
+| (hostel |         search  scope  theme  bell  user                     |
+|  first: | CONTEXT BAR  active investigation chips                      |
+|  Today, |--------------------------------------------------------------|
+|  Comp-  | EXECUTIVE MORNING BRIEF   overnight ledger + status pill     |
+|  laints,|                           health score, priority, AI summary |
+|  Spaces,|--------------------------------------------------------------|
+|  People,| "What is happening today?"   six operational signal cards    |
+|  Assets,|--------------------------------------------------------------|
+|  Money, | "What keeps breaking?"        | MISSION CONTROL              |
+|  Fore-  |   complaint intelligence      |  (sticky AI rail, spans      |
+|  cast)  |------------------------------ |   the investigation bands)   |
+|         | "Where is it happening?"      |                              |
+|         |   THE HOSTEL HEATMAP (hero)   |                              |
+|         |------------------------------ |                              |
+|         | "Who owns the problem?"       |                              |
+|         |   ownership queue + staff     |                              |
+|         |--------------------------------------------------------------|
+|         | "What will become a problem soon?"  maintenance, cost,       |
+|         |   prediction — each convertible into a recommendation        |
++---------+--------------------------------------------------------------+
+```
+
+Sidebar and section labels avoid Dashboard / Overview / Analytics entirely. Nav reads: Today, Complaints, Spaces, People, Assets, Money, Forecast, Settings — with the hostel name and shift indicator at the top as the product identity.
 
 ## Band specifications
 
-**Band 1 — Executive Brief (What is happening now).** Full-width band, three zones: Hostel Health Score as a large radial gauge with week delta; AI Executive Summary written as three claim sentences with confidence noted; Today's Priority as one named commitment with a single primary action and its owner. An Overall Operational Status pill (Stable / Strained / Critical) anchors the left.
+**Executive Morning Brief.** The newspaper headline of the day, full width, largest type on the page. Left: an overnight ledger as a scannable list of eight or fewer plain sentences (received, resolved, approaching breach, inspections completed, occupancy milestone, outage restored, one item awaiting approval) — each line clickable, each click narrowing the investigation context. Right: Hostel Health Score as a radial gauge with week delta, Overall Operational Status pill (Stable / Strained / Critical), Today's Priority as one named commitment with owner and primary action, and the AI Executive Summary as three claim sentences with confidence.
 
-**Band 2 — KPI signal strip.** Six cards: Occupancy, Student Satisfaction, Infrastructure Health, Open Complaints, SLA Compliance, Housekeeping Completion. Each carries label + icon, big tabular value, delta chip, 40px sparkline, and a consequence clause answering "so what" ("SLA 88% — 6 items breach before midnight"). Entire card is a button into the drill-down drawer.
+**"What is happening today?"** Six signal cards — Occupancy, Student Satisfaction, Infrastructure Health, Complaint Health, Housekeeping Status, Maintenance Status. Each is three lines, never a bare number: the metric with delta and sparkline, the consequence, the recommended action. "SLA 88% — six complaints breach before midnight — assign two more electricians" with an inline action and a drill-down affordance.
 
-**Band 3 — Complaint Intelligence (Why).** Grouped as three questions, each with a written takeaway: *what keeps happening* (top categories, distribution, severity split, repeat and reopened rates), *how it moves* (frequency over time with trend line, seasonal comparison, peak-hour matrix), *how fast we clear it* (aging histogram, resolution-time distribution). Charts are monochrome-plus-status, gridlines hairline, axis labels 11px.
+**"What keeps breaking?"** Complaint intelligence in three clusters, each opening with a written takeaway: what keeps happening (top categories, distribution, severity split, repeat and reopened rates), how it moves (frequency over time, seasonal comparison, peak-hour matrix), how fast we clear it (aging, resolution-time distribution). Every category mark is clickable and writes to context. Each cluster closes with a recommended action, not a legend.
 
-**Band 4 — Spatial Intelligence (Where).** Interactive heatmap as the centrepiece: Hostel > Block > Floor > Room with a breadcrumb, every cell keyboard-focusable and clickable into the drawer; selecting a cell re-scopes the bands above. Beside it: hostel/block/floor comparison bars, most problematic rooms and hotspot list.
+**"Where is it happening?" — the heatmap, signature component.** The largest interactive element on the page, ~2/3 viewport height. Hostel > Block > Floor > Room with breadcrumb drilldown and animated zoom between levels. Cells coloured by composite operational health on a graphite-to-amber-to-red scale, never by category. Hover reveals a rich tooltip: room number, complaint count, complaint types, maintenance history summary, occupant, inspection score, infrastructure health, estimated maintenance cost. Click re-scopes the entire dashboard and offers Open investigation. Under the active context, unaffected cells dim rather than disappear so the pattern stays legible. Beside it: hostel/block/floor comparison bars, most problematic rooms, hotspot list — all context-linked. Fully keyboard navigable with arrow-key cell traversal.
 
-**Band 5 — Operational Intelligence (Who, part 1).** One ownership queue, not seven widgets: active emergencies, SLA breaches, pending inspections, pending maintenance, housekeeping backlog, escalations and critical alerts appear as severity-sorted rows with a severity rail, location chip, unowned duration, owner avatar, and inline Assign / Escalate / Inspect. The seven categories are filter chips over this one queue.
+**"Who owns the problem?"** One ownership queue replacing seven widgets: active emergencies, SLA breaches, pending inspections, pending maintenance, housekeeping backlog, escalations, critical alerts as severity-sorted rows with severity rail, location chip, unowned duration, owner avatar, inline Assign / Escalate / Inspect. Categories are filter chips over the single queue. Below: staff workload bars, availability, response and resolution medians, cleaning performance, inspection completion, leaderboard — overloaded vs idle as the headline, ending in Rebalance.
 
-**Band 6 — Staff Intelligence (Who, part 2).** Workload bars per staff member, availability state, response and resolution medians, cleaning performance, inspection completion, leaderboard table. Overloaded vs idle contrast is the headline, and the band ends in a Rebalance action.
+**Mission Control (AI).** Not a card — a sticky rail that travels with the investigation bands, visually distinct (slightly elevated surface, its own header, an "active decisions" count). Each recommendation is a decision object: title with urgency icon, WHY in one sentence, an evidence list of 2-3 cited findings, confidence score with meter, operational impact, estimated financial impact if ignored (₹), urgency badge, primary action button, and See Evidence which scrolls to and flashes the exact chart mark or heatmap cell that produced it while writing that scope into the context. Resolving a recommendation animates it into a Decided section with a timestamp, so the rail reads as the day's decision log.
 
-**Band 7 — AI Recommendations (What next).** Pinned right rail on wide screens, promoted above charts on mobile. Each card: the ask, WHY drawn from the evidence above, confidence meter, expected impact in operational and rupee terms, priority badge, and Approve / Snooze / See evidence — where "See evidence" scrolls to the exact chart or heatmap cell that produced it.
+**"What will become a problem soon?"** Maintenance (most repaired assets, recurring failures, preventive schedule, asset health, cost trend, replacement candidates with payback), financial (spending, budget utilisation, cost by hostel, cost by complaint type, monthly trend), and predictive (complaint forecast with confidence band, high-risk rooms, expected maintenance cost, expected occupancy, failure prediction). Every forecast card carries the cost of inaction and a Convert to recommendation action that promotes it into Mission Control.
 
-**Band 8 — Maintenance & Financial Intelligence (What breaks soon, cost).** Most-repaired assets, recurring failures, preventive-maintenance schedule, asset health table, maintenance cost trend, replacement recommendations with payback. Then maintenance spending, budget utilisation bar, cost by hostel, cost by complaint type, monthly trend.
+**Investigation Drawer.** 520px right drawer opened from any card, row, table or heatmap cell. Header names the entity and its health; tabs: Timeline, Previous Complaints, Maintenance History, Inspection History, Assigned Staff, Student Feedback, Photos, Assets in Room, AI Recommendation. Sticky footer holds one primary action plus Investigate further, which pushes the entity into context and closes the drawer so the page below is already re-scoped.
 
-**Band 9 — Predictive Intelligence.** Complaint forecast with a confidence band, high-risk rooms, expected maintenance cost, expected occupancy, failure prediction — each forecast card offering "convert to recommendation" so a prediction becomes a decision.
-
-**Persistent chrome.** Collapsible sidebar with grouped sections (Executive, Intelligence, Operations, Settings) and a user chip footer. Sticky header: breadcrumb, page title, status pill, ⌘K search, scope filters as removable chips (date, hostel, block, category, severity, staff), theme toggle, notification bell with unread dot. Notification Center as a right sheet grouped by event type. Drill-down drawer (520px) opening from any card, row or heatmap cell with tabs — Timeline, History, Photos, Assigned Staff, Previous Complaints, Maintenance History, Student Feedback, Recommendations — and a sticky primary action. Modals only for committing or destructive actions.
+**Persistent chrome.** Sticky header: hostel name + shift, ⌘K search, scope filters, theme toggle (dark first), notification bell with unread dot, user chip. Notification Center as a right sheet grouped by event type, each event clickable into the investigation. Modals only to commit or destroy.
 
 ## Design language
 
-- Dark mode first, header toggle to light; all theming through semantic tokens.
-- Near-black graphite canvas, elevated card surfaces, hairline borders, soft low-spread shadows, 10-12px radii. One blue accent for interaction; emerald / amber / red strictly for status. No decorative gradients.
-- Glass used twice only: sticky header and drawer scrim.
-- Typography: one clean geometric sans — 32/40 display verdicts, 20/28 band titles, 13-14 body, 11 uppercase tracked labels, tabular numerals for every metric.
-- Spacing: 8px base, 24px card padding, 40-48px band rhythm, 1440px max width, generous negative space.
-- Motion: 120-180ms ease-out hovers, 220ms drawer slide, staggered skeleton-to-content fade on load, reduced-motion respected. Nothing loops.
-- Accessibility: 4.5:1 minimum, visible focus rings, status carries icon plus text, heatmap and drawer fully keyboard operable.
-- Responsive: sidebar to icon rail under 1280px and a sheet under 768px; KPI strip 6 > 3 > 2; recommendation rail promoted above evidence on mobile.
+- Dark mode first with a header toggle; all theming via semantic tokens.
+- Near-black graphite canvas, elevated card surfaces, hairline borders, soft low-spread shadows, 10-12px radii. One blue accent for interaction; emerald / amber / red for status only. No decorative gradients. Glass used twice: sticky header and drawer scrim.
+- Typography: one clean geometric sans — 34/42 brief headline, 20/28 question titles, 13-14 body, 11 uppercase tracked labels, tabular numerals everywhere.
+- Spacing: 8px base, 24px card padding, 48px band rhythm, 1440px max width, generous negative space.
+- Motion earns its place: 120-180ms hovers, 220ms drawer, 260ms heatmap level zoom, context changes cross-fade affected bands, See Evidence scroll plus a single 400ms highlight pulse. Reduced-motion respected; nothing loops.
+- Accessibility: 4.5:1 minimum, visible focus rings, status carries icon plus text, heatmap and drawer fully keyboard operable, context changes announced politely.
+- Responsive: sidebar to icon rail under 1280px and a sheet under 768px; signal strip 6 > 3 > 2; Mission Control becomes a promoted section above the evidence bands on mobile; heatmap gains a level-selector control in place of hover tooltips.
+
+## Reference extraction (inspiration only, nothing copied)
+
+Lunor: dark shell, hairline cards, grouped sidebar. Kravio: signal-card anatomy and the right-hand activity rail that becomes the Notification Center. Power BI: small-multiple discipline and titled-with-dimension charts (its palette rejected). Signalry: metric row -> three-up analysis -> full-width insight table rhythm. PlanMate: card breathing room and light-theme calibration. Adflux: breadcrumb + title + status pill + filter cluster as one header block, delta chips. TailAdmin: header composition (collapse, ⌘K search, theme toggle, bell with dot, user chip) and the radial gauge reused for Health Score (its brightness rejected); its skeleton shot sets the loading choreography. No reference data, palette or branding is reused.
 
 ## Technical notes
 
-- Tokens (surfaces, borders, status, radii, shadows, chart series) defined in `src/styles.css` as oklch variables for both themes; components consume semantic tokens only.
+- Tokens (surfaces, borders, status scale, heatmap ramp, radii, shadows, chart series) defined in `src/styles.css` as oklch variables for both themes; components consume semantic tokens only.
 - Presented at `/`, replacing the placeholder index. No other page touched, no routes added.
-- Charts use existing chart primitives styled to the token palette with illustrative static values; no fetching, no persistence. Lucide icons at 16/18px, 1.5px stroke. Theme toggle is presentation-only.
+- The shared investigation context is client-side presentation state only; charts use existing chart primitives with illustrative static values. No fetching, no persistence. Lucide icons at 16/18px, 1.5px stroke.
