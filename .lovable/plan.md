@@ -1,6 +1,30 @@
 # HOIDSS — Hostel Operations Intelligence (Design Only)
 
-An operations-intelligence console for the Hostel Incharge of PICT Boys Hostel. Not a dashboard of charts: one continuous investigation surface where every element hands the reader to the next question. Deliverable is design — workflow, context model, hierarchy, narrative, component semantics, tokens, motion. No backend, no APIs, no auth, no data models, no business logic, no new routes.
+An operations-intelligence console for the Hostel Incharge of PICT Boys Hostel. Not a dashboard of charts: one calm, continuous investigation surface where every element hands the reader to the next question and detail appears only when asked for. Deliverable is design — workflow, context model, hierarchy, disclosure tiers, component semantics, tokens, motion. No backend, no APIs, no auth, no data models, no business logic, no new routes.
+
+## Calm by default: three tiers of disclosure
+
+The full feature list is not a layout instruction. Everything requested exists, but only Tier 1 is on screen at rest.
+
+```text
+TIER 1  AT REST      What must be seen without asking.
+                     Morning brief, six signals, heatmap, Mission Control,
+                     the ownership queue's top items. Fits ~2 screens.
+TIER 2  ON REQUEST   Expanded in place: a band opens into its detail cluster
+                     (charts, comparisons, tables) when the reader chooses it,
+                     or when the investigation context makes it relevant.
+TIER 3  ON INVESTIGATION  The drawer. Per-entity depth: timelines, histories,
+                     photos, feedback, assets, per-room recommendation.
+```
+
+Rules that keep it calm:
+
+- No band shows more than three visuals at rest; the rest live behind a single "Show detail" expansion with a one-line summary of what is inside.
+- Every band opens with one plain-language verdict sentence. If the reader reads only sentences, they are correctly informed and can stop.
+- A metric appears once on the page. Repetition is replaced by links into context.
+- Whitespace is a requirement, not a leftover: 48px between bands, at most six cards in any row, no card shorter than its content needs.
+- Charts default to their simplest useful form. Small multiples, dual axes and dense matrices are Tier 2 only.
+- If a section cannot be made legible in its slot, the layout changes — the section moves to Tier 2 or gets its own full-width band. Nothing is shrunk to fit.
 
 ## The investigation loop (the core UX contract)
 
@@ -9,60 +33,60 @@ WHAT is happening?  ->  WHY?  ->  WHERE exactly?  ->  WHO owns it?
         ->  WHAT should I do?  ->  WHAT if I don't?
 ```
 
-**One shared investigation context** drives the whole page: `{ category, hostel, block, floor, room, severity, dateRange, staff }`. Any click writes to it; every band reads from it.
+**One shared investigation context** drives the page: `{ category, hostel, block, floor, room, severity, dateRange, staff }`. Any click writes to it; every band reads from it.
 
-- Clicking a KPI, a category slice, an alert row, a staff member, an inspection or a heatmap cell narrows the context — it does not open a dead end.
-- A **context bar** under the header shows the active investigation as removable chips ("Electrical", "Block B", "Last 14 days") with Clear all, plus a back-step so the reader can retrace the investigation.
-- Bands re-narrate under the active context: titles, verdict sentences and recommended actions all restate against the current filter.
+- Clicking a KPI, category, alert row, staff member, inspection or heatmap cell narrows the context — never a dead end.
+- A **context bar** under the header shows the active investigation as removable chips ("Electrical", "Block B", "Last 14 days") with Clear all and a back-step to retrace.
+- Under an active context, relevant Tier 2 detail auto-expands and irrelevant bands collapse to their verdict line — the page gets quieter as the question gets sharper.
 
-Worked path, designed explicitly: Open Complaints -> Electrical -> Complaint Intelligence re-scopes to Electrical -> heatmap highlights affected hostels/blocks/floors/rooms and dims the rest -> selecting Room B-214 opens the Investigation Drawer -> drawer ends in Approve inspection, which returns the reader to Mission Control with that recommendation resolved.
+Worked path: Open Complaints -> Electrical -> complaint detail expands, scoped to Electrical -> heatmap highlights affected blocks and dims the rest -> Room B-214 opens the Investigation Drawer -> drawer ends in Approve inspection, returning to Mission Control with that decision logged.
 
 ## Page order and natural-language titles
 
 ```text
 +---------+--------------------------------------------------------------+
-| SIDEBAR | HEADER  PICT Boys Hostel / Today's Operational Status        |
-| (hostel |         search  scope  theme  bell  user                     |
-|  first: | CONTEXT BAR  active investigation chips                      |
-|  Today, |--------------------------------------------------------------|
-|  Comp-  | EXECUTIVE MORNING BRIEF   overnight ledger + status pill     |
-|  laints,|                           health score, priority, AI summary |
-|  Spaces,|--------------------------------------------------------------|
-|  People,| "What is happening today?"   six operational signal cards    |
-|  Assets,|--------------------------------------------------------------|
-|  Money, | "What keeps breaking?"        | MISSION CONTROL              |
-|  Fore-  |   complaint intelligence      |  (sticky AI rail, spans      |
-|  cast)  |------------------------------ |   the investigation bands)   |
-|         | "Where is it happening?"      |                              |
-|         |   THE HOSTEL HEATMAP (hero)   |                              |
+| SIDEBAR | HEADER   PICT Boys Hostel / Today's Operational Status       |
+| Today   | CONTEXT BAR   active investigation chips                     |
+| Comp-   |--------------------------------------------------------------|
+| laints  | EXECUTIVE MORNING BRIEF   overnight ledger + status,          |
+| Spaces  |                           health score, priority, AI summary |
+| People  |--------------------------------------------------------------|
+| Assets  | "What is happening today?"   six signal cards, 3 lines each   |
+| Money   |--------------------------------------------------------------|
+| Forecast| "Where is it happening?"      | MISSION CONTROL              |
+|         |   THE HOSTEL HEATMAP (hero)   |  sticky AI rail, travels     |
+|         |------------------------------ |  with the investigation      |
+|         | "What keeps breaking?"        |  bands                       |
+|         |   verdict + 3 visuals         |                              |
+|         |   [Show complaint detail]     |                              |
 |         |------------------------------ |                              |
 |         | "Who owns the problem?"       |                              |
-|         |   ownership queue + staff     |                              |
+|         |   top 5 queue [Open queue]    |                              |
 |         |--------------------------------------------------------------|
-|         | "What will become a problem soon?"  maintenance, cost,       |
-|         |   prediction — each convertible into a recommendation        |
+|         | "What will become a problem soon?"  3 forecast cards          |
+|         |   [Show maintenance & cost detail]                            |
 +---------+--------------------------------------------------------------+
 ```
 
-Sidebar and section labels avoid Dashboard / Overview / Analytics entirely. Nav reads: Today, Complaints, Spaces, People, Assets, Money, Forecast, Settings — with the hostel name and shift indicator at the top as the product identity.
+The heatmap sits above complaint detail because "where" is the Incharge's fastest route to action. Sidebar and section labels avoid Dashboard / Overview / Analytics: Today, Complaints, Spaces, People, Assets, Money, Forecast, Settings, with the hostel name and shift as the product identity.
 
 ## Band specifications
 
-**Executive Morning Brief.** The newspaper headline of the day, full width, largest type on the page. Left: an overnight ledger as a scannable list of eight or fewer plain sentences (received, resolved, approaching breach, inspections completed, occupancy milestone, outage restored, one item awaiting approval) — each line clickable, each click narrowing the investigation context. Right: Hostel Health Score as a radial gauge with week delta, Overall Operational Status pill (Stable / Strained / Critical), Today's Priority as one named commitment with owner and primary action, and the AI Executive Summary as three claim sentences with confidence.
+**Executive Morning Brief (Tier 1).** The newspaper headline of the day, full width, largest type on the page. Left: the overnight ledger as up to eight plain clickable sentences (received, resolved, approaching breach, inspections completed, occupancy milestone, outage restored, one item awaiting approval), each click narrowing context. Right: Hostel Health Score radial gauge with week delta, Overall Operational Status pill (Stable / Strained / Critical), Today's Priority as one named commitment with owner and primary action, AI Executive Summary as three claim sentences with confidence.
 
-**"What is happening today?"** Six signal cards — Occupancy, Student Satisfaction, Infrastructure Health, Complaint Health, Housekeeping Status, Maintenance Status. Each is three lines, never a bare number: the metric with delta and sparkline, the consequence, the recommended action. "SLA 88% — six complaints breach before midnight — assign two more electricians" with an inline action and a drill-down affordance.
+**"What is happening today?" (Tier 1).** Six signal cards — Occupancy, Student Satisfaction, Infrastructure Health, Complaint Health, Housekeeping Status, Maintenance Status. Three lines each, never a bare number: metric with delta and sparkline; the consequence; the recommended action with an inline control. Cards that are within tolerance say so and stay quiet — no alarm styling, no filler action.
 
-**"What keeps breaking?"** Complaint intelligence in three clusters, each opening with a written takeaway: what keeps happening (top categories, distribution, severity split, repeat and reopened rates), how it moves (frequency over time, seasonal comparison, peak-hour matrix), how fast we clear it (aging, resolution-time distribution). Every category mark is clickable and writes to context. Each cluster closes with a recommended action, not a legend.
+**"Where is it happening?" — the heatmap, signature component (Tier 1).** The largest interactive element, roughly two-thirds viewport height, given its own full-width band with real margins. Hostel > Block > Floor > Room via breadcrumb with animated level zoom. Cells coloured by composite operational health on a graphite-to-amber-to-red ramp, never by category. Hover reveals a rich tooltip: room number, complaint count, complaint types, maintenance summary, occupant, inspection score, infrastructure health, estimated maintenance cost. Click re-scopes the dashboard. Comparisons (hostel / block / floor bars, most problematic rooms, hotspots) are Tier 2 under "Compare spaces" so the map itself stays uncluttered. Arrow-key cell traversal, focus visible.
 
-**"Where is it happening?" — the heatmap, signature component.** The largest interactive element on the page, ~2/3 viewport height. Hostel > Block > Floor > Room with breadcrumb drilldown and animated zoom between levels. Cells coloured by composite operational health on a graphite-to-amber-to-red scale, never by category. Hover reveals a rich tooltip: room number, complaint count, complaint types, maintenance history summary, occupant, inspection score, infrastructure health, estimated maintenance cost. Click re-scopes the entire dashboard and offers Open investigation. Under the active context, unaffected cells dim rather than disappear so the pattern stays legible. Beside it: hostel/block/floor comparison bars, most problematic rooms, hotspot list — all context-linked. Fully keyboard navigable with arrow-key cell traversal.
+**"What keeps breaking?" (Tier 1 verdict + 3 visuals, Tier 2 detail).** At rest: the verdict sentence, top complaint categories, frequency over time, and complaint aging. Behind "Show complaint detail": distribution, severity split, repeat and reopened rates, seasonal comparison, peak-hour matrix, resolution-time distribution. Every category mark writes to context. Each cluster closes with a recommended action, not a legend.
 
-**"Who owns the problem?"** One ownership queue replacing seven widgets: active emergencies, SLA breaches, pending inspections, pending maintenance, housekeeping backlog, escalations, critical alerts as severity-sorted rows with severity rail, location chip, unowned duration, owner avatar, inline Assign / Escalate / Inspect. Categories are filter chips over the single queue. Below: staff workload bars, availability, response and resolution medians, cleaning performance, inspection completion, leaderboard — overloaded vs idle as the headline, ending in Rebalance.
+**"Who owns the problem?" (Tier 1 top five, Tier 2 full queue).** One ownership queue instead of seven widgets: emergencies, SLA breaches, pending inspections, pending maintenance, housekeeping backlog, escalations, critical alerts as severity-sorted rows with severity rail, location chip, unowned duration, owner avatar, inline Assign / Escalate / Inspect. Five rows at rest with a count of what is hidden; "Open queue" expands to the filterable full table. Staff detail (workload, availability, response and resolution medians, cleaning performance, inspection completion, leaderboard) is Tier 2 under "Who has capacity?", headlined by overloaded vs idle and ending in Rebalance.
 
-**Mission Control (AI).** Not a card — a sticky rail that travels with the investigation bands, visually distinct (slightly elevated surface, its own header, an "active decisions" count). Each recommendation is a decision object: title with urgency icon, WHY in one sentence, an evidence list of 2-3 cited findings, confidence score with meter, operational impact, estimated financial impact if ignored (₹), urgency badge, primary action button, and See Evidence which scrolls to and flashes the exact chart mark or heatmap cell that produced it while writing that scope into the context. Resolving a recommendation animates it into a Decided section with a timestamp, so the rail reads as the day's decision log.
+**Mission Control (Tier 1, persistent).** Not a card — a sticky rail travelling with the investigation bands, on its own elevated surface with an active-decisions count. Three recommendations at rest, ranked; the rest behind a count. Each is a decision object: title with urgency icon, WHY in one sentence, 2-3 cited evidence findings, confidence score with meter, operational impact, estimated financial impact if ignored (₹), urgency badge, primary action, and See Evidence which scrolls to and pulses the exact chart mark or heatmap cell while writing that scope into context. Resolved items animate into a timestamped Decided log, so the rail reads as the day's decisions.
 
-**"What will become a problem soon?"** Maintenance (most repaired assets, recurring failures, preventive schedule, asset health, cost trend, replacement candidates with payback), financial (spending, budget utilisation, cost by hostel, cost by complaint type, monthly trend), and predictive (complaint forecast with confidence band, high-risk rooms, expected maintenance cost, expected occupancy, failure prediction). Every forecast card carries the cost of inaction and a Convert to recommendation action that promotes it into Mission Control.
+**"What will become a problem soon?" (Tier 1 three cards, Tier 2 detail).** At rest: complaint forecast with confidence band, high-risk rooms, expected maintenance cost — each stating the cost of inaction and offering Convert to recommendation, which promotes it into Mission Control. Behind "Show maintenance & cost detail": most repaired assets, recurring failures, preventive schedule, asset health, replacement candidates with payback, spending, budget utilisation, cost by hostel, cost by complaint type, monthly trend, expected occupancy, failure prediction.
 
-**Investigation Drawer.** 520px right drawer opened from any card, row, table or heatmap cell. Header names the entity and its health; tabs: Timeline, Previous Complaints, Maintenance History, Inspection History, Assigned Staff, Student Feedback, Photos, Assets in Room, AI Recommendation. Sticky footer holds one primary action plus Investigate further, which pushes the entity into context and closes the drawer so the page below is already re-scoped.
+**Investigation Drawer (Tier 3).** 520px right drawer from any card, row, table or heatmap cell. Header names the entity and its health; tabs: Timeline, Previous Complaints, Maintenance History, Inspection History, Assigned Staff, Student Feedback, Photos, Assets in Room, AI Recommendation. Only the first tab loads visually at open; the rest reveal on selection. Sticky footer: one primary action plus Investigate further, which pushes the entity into context and closes the drawer onto an already re-scoped page.
 
 **Persistent chrome.** Sticky header: hostel name + shift, ⌘K search, scope filters, theme toggle (dark first), notification bell with unread dot, user chip. Notification Center as a right sheet grouped by event type, each event clickable into the investigation. Modals only to commit or destroy.
 
@@ -70,18 +94,18 @@ Sidebar and section labels avoid Dashboard / Overview / Analytics entirely. Nav 
 
 - Dark mode first with a header toggle; all theming via semantic tokens.
 - Near-black graphite canvas, elevated card surfaces, hairline borders, soft low-spread shadows, 10-12px radii. One blue accent for interaction; emerald / amber / red for status only. No decorative gradients. Glass used twice: sticky header and drawer scrim.
-- Typography: one clean geometric sans — 34/42 brief headline, 20/28 question titles, 13-14 body, 11 uppercase tracked labels, tabular numerals everywhere.
-- Spacing: 8px base, 24px card padding, 48px band rhythm, 1440px max width, generous negative space.
-- Motion earns its place: 120-180ms hovers, 220ms drawer, 260ms heatmap level zoom, context changes cross-fade affected bands, See Evidence scroll plus a single 400ms highlight pulse. Reduced-motion respected; nothing loops.
-- Accessibility: 4.5:1 minimum, visible focus rings, status carries icon plus text, heatmap and drawer fully keyboard operable, context changes announced politely.
-- Responsive: sidebar to icon rail under 1280px and a sheet under 768px; signal strip 6 > 3 > 2; Mission Control becomes a promoted section above the evidence bands on mobile; heatmap gains a level-selector control in place of hover tooltips.
+- Typography: one clean geometric sans — 34/42 brief headline, 20/28 question titles, 14/22 body sized for daily reading, 11 uppercase tracked labels, tabular numerals everywhere.
+- Spacing: 8px base, 24-28px card padding, 48px band rhythm, 1440px max width, generous negative space.
+- Motion earns its place: 120-180ms hovers, 220ms drawer, 260ms heatmap zoom, 200ms expand/collapse with height animation, context changes cross-fade affected bands, See Evidence scroll plus one 400ms pulse. Reduced-motion respected; nothing loops.
+- Accessibility: 4.5:1 minimum, visible focus rings, status carries icon plus text, heatmap and drawer fully keyboard operable, expansions are real disclosure buttons with aria-expanded, context changes announced politely.
+- Responsive: sidebar to icon rail under 1280px and a sheet under 768px; signal strip 6 > 3 > 2; Mission Control promoted above the evidence bands on mobile; heatmap gains a level selector in place of hover tooltips; all Tier 2 sections stay collapsed by default on small screens.
 
 ## Reference extraction (inspiration only, nothing copied)
 
-Lunor: dark shell, hairline cards, grouped sidebar. Kravio: signal-card anatomy and the right-hand activity rail that becomes the Notification Center. Power BI: small-multiple discipline and titled-with-dimension charts (its palette rejected). Signalry: metric row -> three-up analysis -> full-width insight table rhythm. PlanMate: card breathing room and light-theme calibration. Adflux: breadcrumb + title + status pill + filter cluster as one header block, delta chips. TailAdmin: header composition (collapse, ⌘K search, theme toggle, bell with dot, user chip) and the radial gauge reused for Health Score (its brightness rejected); its skeleton shot sets the loading choreography. No reference data, palette or branding is reused.
+Lunor: dark shell, hairline cards, grouped sidebar. Kravio: signal-card anatomy and the right-hand activity rail that becomes the Notification Center. Power BI: titled-with-dimension chart discipline, held to Tier 2 (its palette and density rejected). Signalry: metric row -> analysis -> full-width table rhythm. PlanMate: card breathing room and light-theme calibration. Adflux: breadcrumb + title + status pill + filter cluster as one header block, delta chips. TailAdmin: header composition (collapse, ⌘K search, theme toggle, bell with dot, user chip) and the radial gauge reused for Health Score (its brightness rejected); its skeleton shot sets the loading choreography. No reference data, palette or branding is reused.
 
 ## Technical notes
 
 - Tokens (surfaces, borders, status scale, heatmap ramp, radii, shadows, chart series) defined in `src/styles.css` as oklch variables for both themes; components consume semantic tokens only.
 - Presented at `/`, replacing the placeholder index. No other page touched, no routes added.
-- The shared investigation context is client-side presentation state only; charts use existing chart primitives with illustrative static values. No fetching, no persistence. Lucide icons at 16/18px, 1.5px stroke.
+- Investigation context and disclosure state are client-side presentation state only; charts use existing chart primitives with illustrative static values. No fetching, no persistence. Lucide icons at 16/18px, 1.5px stroke.
